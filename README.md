@@ -1,57 +1,35 @@
-# Project Name
+# OpenHack-CLI
 
-(short, 1-3 sentenced, description of the project)
+CLI tool `oh` to provision more that one resources on Azure in parallel
 
 ## Features
 
-This project framework provides the following features:
+Current commands supported :
 
-* Feature 1
-* Feature 2
-* ...
+* Resource Group
+* SPN
+* AKS
 
 ## Getting Started
 
 ### Prerequisites
 
-(ideally very short, if any)
+`docker run -it julienstroheker/oh --help`
 
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
+### Quickstart / Contribution
 (Add steps to get up and running quickly)
 
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
+1. `go get github.com/Azure-Samples/openhack-team-cli`
+2. Fork that repository into your GitHub account
+3. Add your repository as a remote for $GOPATH/github.com/Azure/openhack-team-cli
+4. Create a new working branch (git checkout -b feat/my-feature) and do your work on that branch.
+5. When you are ready for us to review, push your branch to GitHub, and then open a new pull request with us.
 
+#### Code Structure
 
-## Demo
+The code for the project is organized as follows:
 
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+* The individual programs are located in cmd/. Code inside of cmd/ is not designed for library re-use.
+* Shared libraries are stored in pkg/.
+* The tests/ directory contains a number of utility scripts. Most of these are used by the CI/CD pipeline. [TODO]
+* The docs/ folder is used for documentation and examples. [TODO]
