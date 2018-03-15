@@ -77,6 +77,7 @@ fi
 #set the default subscription id
 az account set --subscription $subscriptionId
 
+#TODO need to check if provider is registered and if so don't run this command.  Also probably need to sleep a few minutes for this to finish.
 az provider register -n Microsoft.ContainerService
 
 set +e
@@ -99,20 +100,21 @@ echo "Creating AKS Cluster..."
     az aks create -g $resourceGroupName -n $clusterName -l $resourceGroupLocation --node-count 4 --generate-ssh-keys -k 1.9.2 1> /dev/null
 )
 
-if [ $?  == 0 ];
+if [ $? == 0 ];
 then
-    echo "AKS Cluster" $clusterName "created successfully..."
+    echo "Cluster AKS:" $clusterName "created successfully..."
 fi
 
 echo "Installing Kubernetes CLI..."
 (
     set -x
     az aks install-cli 1> /dev/null
+    export $PATH=$PATH+':/usr/local/bin/kubectl'
 )
 
-if [ $?  == 0 ];
+if [ $? == 0 ];
 then
-    echo "kubernetes CLI for " $clusterName "installed successfully..."
+    echo "kubernetes CLI for AKS:" $clusterName "installed successfully..."
 fi
 
 echo "Getting Credentials for AKS cluster..."
@@ -121,9 +123,9 @@ echo "Getting Credentials for AKS cluster..."
     az aks get-credentials --resource-group=$resourceGroupName --name=$clusterName
 )
 
-if [ $?  == 0 ];
+if [ $? == 0 ];
 then
-    echo "Credentilas for AKS " $clusterName " retrieved successfully..."
+    echo "Credentials for AKS:" $clusterName " retrieved successfully..."
 fi
 
 
