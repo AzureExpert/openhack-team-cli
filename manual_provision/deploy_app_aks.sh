@@ -42,3 +42,4 @@ echo "Pushing " $containerName " to " $registryName " ..."
     docker push $containerName
 )
 
+ACR_LOGIN=`az acr list --resource-group rgtest --query "[].{acrLoginServer:loginServer}" --output json | jq .[].acrLoginServer | sed 's/\"//g'`
