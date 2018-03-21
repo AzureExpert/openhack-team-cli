@@ -65,7 +65,7 @@ fi
 if [[ -z "$resourceGroupLocation" ]]; then
     echo "If creating a *new* resource group, you need to set a location "
     echo "You can lookup locations with the CLI using: az account list-locations "
-    
+
     echo "Enter resource group location:"
     read resourceGroupLocation
 fi
@@ -74,21 +74,6 @@ if [ -z "$subscriptionId" ] || [ -z "$resourceGroupName" ] || [ -z "$clusterName
     echo "Either one of subscriptionId, resourceGroupName, clusterName or registryName is empty"
     usage
 fi
-
-#login to azure using your credentials
-az account show 1> /dev/null
-
-if [ $? != 0 ];
-then
-    az login
-fi
-
-#set the default subscription id
-az account set --subscription $subscriptionId
-
-#TODO need to check if provider is registered and if so don't run this command.  Also probably need to sleep a few minutes for this to finish.
-az provider register -n Microsoft.ContainerService
-
 
 echo "Retrieving client id..."
 

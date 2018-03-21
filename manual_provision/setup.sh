@@ -91,6 +91,9 @@ fi
 #set the default subscription id
 az account set --subscription $subscriptionId
 
+#TODO need to check if provider is registered and if so don't run this command.  Also probably need to sleep a few minutes for this to finish.
+az provider register -n Microsoft.ContainerService
+
 set +e
 
 #Check for existing RG
@@ -105,8 +108,8 @@ else
     echo "Using existing resource group..."
 fi
 
-# bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupName -r $registryName -l $resourceGroupLocation
-# bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -l $resourceGroupLocation
-# bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -r $registryName -l $resourceGroupLocation
+bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupName -r $registryName -l $resourceGroupLocation
+bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -l $resourceGroupLocation
+bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -r $registryName -l $resourceGroupLocation
 bash ./fetch_build_push_latest.sh -b Release -r $resourceGroupName -t $teamName":latest" -u git@github.com:Azure-Samples/openhack-devops.git -s ~/test_fetch_build
 bash ./deploy_app_aks.sh

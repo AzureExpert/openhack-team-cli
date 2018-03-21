@@ -56,7 +56,7 @@ fi
 if [[ -z "$resourceGroupLocation" ]]; then
     echo "If creating a *new* resource group, you need to set a location "
     echo "You can lookup locations with the CLI using: az account list-locations "
-    
+
     echo "Enter resource group location:"
     read resourceGroupLocation
 fi
@@ -64,31 +64,6 @@ fi
 if [ -z "$subscriptionId" ] || [ -z "$resourceGroupName" ] || [ -z "$registryName" ]; then
     echo "Either one of subscriptionId, resourceGroupName, registryName is empty"
     usage
-fi
-
-#login to azure using your credentials
-az account show 1> /dev/null
-
-if [ $? != 0 ];
-then
-    az login
-fi
-
-#set the default subscription id
-az account set --subscription $subscriptionId
-
-set +e
-
-#Check for existing RG
-if [ `az group exists -n $resourceGroupName` == false ]; then
-    echo "Resource group with name" $resourceGroupName "could not be found. Creating new resource group.."
-    set -e
-    (
-        set -x
-        az group create --name $resourceGroupName --location $resourceGroupLocation 1> /dev/null
-    )
-else
-    echo "Using existing resource group..."
 fi
 
 echo "Creating Registry..."
