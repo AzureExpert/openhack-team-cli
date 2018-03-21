@@ -112,7 +112,7 @@ pushd ./openhack-devops
 
 pushd ./src/MobileAppServiceV2/MyDriving.POIService.v2
 
-dotnet build -c $buildFlavor
+dotnet build -c $buildFlavor -o ./bin/
 
 docker build . -t $TAG 
 
