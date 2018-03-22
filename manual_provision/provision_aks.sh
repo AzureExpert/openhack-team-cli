@@ -89,6 +89,19 @@ then
     echo "kubernetes CLI for AKS:" $clusterName "installed successfully..."
 fi
 
+echo "Installing helm..."
+(
+    set -x
+    curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+    chmod 700 get_helm.sh
+    ./get_helm.sh   
+)
+
+if [ $? == 0 ];
+then
+    echo "helm installed successfully..."
+fi
+
 echo "Getting Credentials for AKS cluster..."
 (
     set -x
