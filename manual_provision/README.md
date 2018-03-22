@@ -9,7 +9,7 @@
 - Azure [AZ cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 - [.net core](https://www.microsoft.com/net/download/)
 - [Docker](https://docs.docker.com/install/)
-- JQ (sudo apt-get install jq)
+- [JQ](https://stedolan.github.io/jq/) (sudo apt-get install jq)
 
 ## Usage
 
