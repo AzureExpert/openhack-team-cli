@@ -7,7 +7,7 @@
 - Access to [MyDriving github repository](https://github.com/Azure-Samples/openhack-devops)
 - [Helm](helm.sh)
 - Azure [AZ cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
-- [.net core](https://www.microsoft.com/net/download/)
+- [.net core 2.0.4](https://www.microsoft.com/net/download/)
 - [Docker](https://docs.docker.com/install/)
 - [JQ](https://stedolan.github.io/jq/) (sudo apt-get install jq)
 
