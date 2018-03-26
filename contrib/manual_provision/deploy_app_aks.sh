@@ -39,5 +39,6 @@ helm init --upgrade
 # Make sure you have the hosts CNAME entry in your DNS provider
 
 echo "helm install ..."
-helm install $relativeSaveLocation "/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm" --name getpois 
+echo $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm"
+helm install $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm" --name getallpois 
 #--set ingress.hosts=mydriving-admin.julien.work,image.repository=julienstroheker.azurecr.io/myapp,image.tag=v34,ingress.path="/api/GetAllPOIs"
