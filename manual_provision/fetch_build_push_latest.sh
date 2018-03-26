@@ -109,10 +109,11 @@ git clone $githubRepository 1> /dev/null
 
 pushd ./openhack-devops
 
-
 pushd ./src/MobileAppServiceV2/MyDriving.POIService.v2
 
 dotnet build -c $buildFlavor -o ./bin/
+
+sed -i '/bin\/MyDriving.POIService.v2.dll\//..\/bin\/MyDriving.POIService.v2.dll/g' ../bin/GetAllPOIs/function.json
 
 docker build . -t $TAG 
 
@@ -122,7 +123,7 @@ popd
 
 popd
 
-rm -rf $relativeSaveLocation
+#rm -rf $relativeSaveLocation
 
 popd
 
