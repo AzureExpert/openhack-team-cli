@@ -114,11 +114,13 @@ pushd ./src/MobileAppServiceV2/MyDriving.POIService.v2
 
 dotnet build -c $buildFlavor -o ./bin/
 
-docker build . -t $TAG 
+sed -i -e 's/bin\//..\/bin\//g' ./bin/GetAllPOIs/function.json
+
+docker build . -t $TAG
 
 docker push $TAG
 
-popd 
+popd
 
 popd
 
