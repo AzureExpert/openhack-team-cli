@@ -109,23 +109,18 @@ git clone $githubRepository 1> /dev/null
 
 pushd ./openhack-devops
 
-
 pushd ./src/MobileAppServiceV2/MyDriving.POIService.v2
 
 dotnet build -c $buildFlavor -o ./bin/
 
 sed -i -e 's/bin\//..\/bin\//g' ./bin/GetAllPOIs/function.json
 
-docker build . -t $TAG
+docker build . -t $TAG 
 
 docker push $TAG
 
-popd
+popd 
 
 popd
 
-rm -rf $relativeSaveLocation
-
 popd
-
-

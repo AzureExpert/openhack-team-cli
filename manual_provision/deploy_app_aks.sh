@@ -6,40 +6,39 @@ IFS=$'\n\t'
 # -o: prevents errors in a pipeline from being masked
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
 
-# usage() { echo "Usage: deploy_apps_acr.sh  -r <registryName> -c <containerName>" 1>&2; exit 1; }
+usage() { echo "Usage: deploy_app_aks.sh -s <relative save location>" 1>&2; exit 1; }
 
-# #-i <subscriptionId> -g <resourceGroupName> -c <clusterName> -l <resourceGroupLocation>
-# declare registryName=""
-# declare containerName=""
+declare relativeSaveLocation=""
 
-# # Initialize parameters specified from command line
-# while getopts ":r:c:" arg; do
-#     case "${arg}" in
-#         r)
-#             registryName=${OPTARG}
-#         ;;
-#         c)
-#             containerName=${OPTARG}
-#         ;;
-#     esac
-# done
-# shift $((OPTIND-1))
+# Initialize parameters specified from command line
+while getopts ":s:" arg; do
+    case "${arg}" in
+        s)
+            relativeSaveLocation=${OPTARG}
+        ;;
+    esac
+done
+shift $((OPTIND-1))
 
-# if [[ -z "$registryName" ]]; then
-#     echo "Enter a name for the Azure Container Registry you want to connect:"
-#     read registryName
-# fi
+if [[ -z "$relativeSaveLocation" ]]; then
+    echo "Enter a source code path:"
+    read relativeSaveLocation
+    [[ "${relativeSaveLocation:?}" ]]
+fi
 
-# if [[ -z "$containerName" ]]; then
-#     echo "Enter a name for the Container:"
-#     read containerName
-# fi
+echo "helm init --upgrade ..."
 
-# az acr login --name $registryName
+helm init --upgrade
 
-# echo "Pushing " $containerName " to " $registryName " ..."
-# (
-#     docker push $containerName
-# )
+# Add a loop to wait after the tiller installation
+# Ex : Kubectl get pods --all-namespaces -> tiller-*************** - Creating... Deployed
 
-# ACR_LOGIN=`az acr list --resource-group rgtest --query "[].{acrLoginServer:loginServer}" --output json | jq .[].acrLoginServer | sed 's/\"//g'`
+# You can override the values from the values.yaml using the --set cmd
+# https://github.com/Azure-Samples/openhack-devops/blob/add_helm/src/MobileAppServiceV2/MyDriving.POIService.v2/helm/values.yaml
+
+# Make sure you have the hosts CNAME entry in your DNS provider
+
+echo "helm install ..."
+echo $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm"
+helm install $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm" --name getallpois 
+#--set ingress.hosts=mydriving-admin.julien.work,image.repository=julienstroheker.azurecr.io/myapp,image.tag=v34,ingress.path="/api/GetAllPOIs"
