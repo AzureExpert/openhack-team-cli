@@ -59,6 +59,8 @@ done
 
 # Make sure you have the hosts CNAME entry in your DNS provider
  :
+echo "Installing Traefik Ingress controller ..."
+helm install --name team-ingress stable/traefik --version 1.27.0 -f $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/traefik-values.yaml"
 echo "helm install ... from: " 
 echo $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm"
 echo "Registry: " $registryName 
