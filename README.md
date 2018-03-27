@@ -2,6 +2,12 @@
 
 CLI tool `oh` to provision more that one resources on Azure in parallel
 
+`docker run -it -e AZURE_CLIENT_ID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX \
+     -e AZURE_CLIENT_SECRET=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX \
+     -e AZURE_SUBSCRIPTION_ID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX \
+     -e AZURE_TENANT_ID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX \
+     julienstroheker/oh --help`
+
 ## Features
 
 Current commands supported :
@@ -13,8 +19,6 @@ Current commands supported :
 ## Getting Started
 
 ### Prerequisites
-
-`docker run -it julienstroheker/oh --help`
 
 ### Quickstart / Contribution
 (Add steps to get up and running quickly)

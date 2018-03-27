@@ -48,7 +48,7 @@ func AssignRole(ctx context.Context, principalID, roleDefID string) (role author
 	}
 
 	roleClient, _ := getRoleClient()
-	return roleClient.Create(ctx, *rg.ID, uuid.Must(uuid.NewV1()).String(), authorization.RoleAssignmentCreateParameters{
+	return roleClient.Create(ctx, *rg.ID, uuid.NewV1().String(), authorization.RoleAssignmentCreateParameters{
 		Properties: &authorization.RoleAssignmentProperties{
 			PrincipalID:      to.StringPtr(principalID),
 			RoleDefinitionID: to.StringPtr(roleDefID),
@@ -61,7 +61,7 @@ func AssignRoleWithSubscriptionScope(ctx context.Context, principalID, roleDefID
 	scope := fmt.Sprintf("/subscriptions/%s", helpers.SubscriptionID())
 
 	roleClient, _ := getRoleClient()
-	return roleClient.Create(ctx, scope, uuid.Must(uuid.NewV1()).String(), authorization.RoleAssignmentCreateParameters{
+	return roleClient.Create(ctx, scope, uuid.NewV1().String(), authorization.RoleAssignmentCreateParameters{
 		Properties: &authorization.RoleAssignmentProperties{
 			PrincipalID:      to.StringPtr(principalID),
 			RoleDefinitionID: to.StringPtr(roleDefID),
