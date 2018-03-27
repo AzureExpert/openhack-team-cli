@@ -1,3 +1,4 @@
+# https://github.com/kubernetes/charts/blob/master/stable/traefik/values.yaml
 ## Default values for Traefik
 image: traefik
 imageTag: 1.5.4
@@ -5,6 +6,7 @@ imageTag: 1.5.4
 serviceType: LoadBalancer
 loadBalancerIP:
 # loadBalancerSourceRanges: []
+externalTrafficPolicy: Cluster
 replicas: 1
 cpuRequest: 100m
 memoryRequest: 20Mi
@@ -127,6 +129,7 @@ acme:
   ## certs every time a pod (re-)starts and you WILL be rate limited!
   persistence:
     enabled: true
+    annotations: {}
     ## acme data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -144,7 +147,7 @@ acme:
     # existingClaim:
 dashboard:
   enabled: true
-  domain: myakstraefik01.westus.cloudapp.net
+  domain: myakstraefik02.centralus.cloudapp.net
   service:
     # annotations:
     #   key: value
@@ -161,7 +164,7 @@ dashboard:
     # recentErrors:
 service:
   annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: myakstraefik01
+    service.beta.kubernetes.io/azure-dns-label-name: myakstraefik02
   # labels:
   #   key: value
   ## Further config for service of type NodePort
