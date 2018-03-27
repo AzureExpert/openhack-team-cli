@@ -116,11 +116,11 @@ dotnet build -c $buildFlavor -o ./bin/
 #sed -i '/bin\/MyDriving.POIService.v2.dll\//..\/bin\/MyDriving.POIService.v2.dll/g' ../bin/GetAllPOIs/function.json
 sed -i -e 's/bin\//..\/bin\//g' ./bin/GetAllPOIs/function.json
 
-docker build . -t $TAG
+docker build . -t $TAG 
 
 docker push $TAG
 
-popd
+popd 
 
 popd
 
