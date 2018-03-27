@@ -112,4 +112,4 @@ bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupName -r $registryNam
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -l $resourceGroupLocation
 bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupName -c $clusterName -r $registryName -l $resourceGroupLocation
 bash ./fetch_build_push_latest.sh -b Release -r $resourceGroupName -t $teamName":latest" -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
-bash ./deploy_app_aks.sh -s ./test_fetch_build
+bash ./deploy_app_aks.sh -s ./test_fetch_build -r $registryName

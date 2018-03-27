@@ -5,6 +5,7 @@
 ## Pre-requisites
 
 - Access to [MyDriving github repository](https://github.com/Azure-Samples/openhack-devops)
+- Generete ssh key to get openhack-team-cli https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 - [Helm](helm.sh)
 - Azure [AZ cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
 - [.net core 2.0.4](https://www.microsoft.com/net/download/) [Linux install](https://www.microsoft.com/net/download/linux-package-manager/ubuntu16-04/sdk-current)

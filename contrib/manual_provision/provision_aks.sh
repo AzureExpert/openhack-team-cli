@@ -80,8 +80,7 @@ fi
 echo "Installing Kubernetes CLI..."
 (
     set -x
-    az aks install-cli 1> /dev/null
-    export $PATH=$PATH':/usr/local/bin/kubectl'
+    sudo az aks install-cli 1> /dev/null
 )
 
 if [ $? == 0 ];
