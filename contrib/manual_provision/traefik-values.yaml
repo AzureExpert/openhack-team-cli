@@ -147,7 +147,7 @@ acme:
     # existingClaim:
 dashboard:
   enabled: true
-  domain: myakstraefik02.centralus.cloudapp.net
+  domain: akstraefikreplaceme.locationreplace.cloudapp.azure.com
   service:
     # annotations:
     #   key: value
@@ -164,7 +164,7 @@ dashboard:
     # recentErrors:
 service:
   annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: myakstraefik02
+    service.beta.kubernetes.io/azure-dns-label-name: akstraefikreplaceme
   # labels:
   #   key: value
   ## Further config for service of type NodePort
