@@ -6,19 +6,27 @@ IFS=$'\n\t'
 # -o: prevents errors in a pipeline from being masked
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
 
-usage() { echo "Usage: deploy_app_aks.sh -s <relative save location> -g <resourceGroupName>" 1>&2; exit 1; }
+usage() { echo "Usage: deploy_app_aks.sh -s <relative save location> -g <resourceGroupName> -u <sql server user name> -n <teamName>" 1>&2; exit 1; }
 
 declare relativeSaveLocation=""
 declare resourceGroupName=""
+declare sqlUser=""
+declare teamName=""
 
 # Initialize parameters specified from command line
-while getopts ":s:r:" arg; do
+while getopts ":s:g:n:u:" arg; do
     case "${arg}" in
         s)
             relativeSaveLocation=${OPTARG}
         ;;
         g)
             resourceGroupName=${OPTARG}
+        ;;
+        n)
+            teamName=${OPTARG}
+        ;;
+        u)
+            sqlUser=${OPTARG}
         ;;
     esac
 done
@@ -36,6 +44,17 @@ if [[ -z "$resourceGroupName" ]]; then
     [[ "${relativeSaveLocation:?}" ]]
 fi
 
+if [[ -z "$sqlUser" ]]; then
+    echo "Enter the sql server user name:"
+    read sqlUser
+    [[ "${relativeSaveLocation:?}" ]]
+fi
+
+if [[ -z "$teamName" ]]; then
+    echo "Enter a team name to be used in app provisioning:"
+    read teamName
+fi
+
 INGRESS_IP=$(kubectl get svc team-ingress-traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 # Get the name of the SQL server
@@ -50,4 +69,15 @@ echo -e "\n\nSQL Server Firewall rule added to allow $INGRESS_IP."
 sqlServerFQDN=$(az sql server list -g $resourceGroupName -o tsv --query [0].fullyQualifiedDomainName)
 sqlPassword=$(az keyvault secret show --vault-name devops-openhack-keyvault --name sqlServerAdminPassword -o tsv --query value)
 
-# TODO: replace the values in the secrets.yaml, base64 encode them, create the secret on the cluster
+# Base64 encode the values are required for K8s secrets
+sqlServerFQDNbase64=$(echo $sqlServerFQDN | base64)
+sqlPasswordbase64=$(echo $sqlPassword | base64)
+sqlUserbase64=$(echo $sqlUser | base64)
+
+# Replace the secrets file with encoded values and create the secret on the cluster
+cat $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/sql-secret.yaml" \
+    | sed "s/userreplace/$sqlUserbase64/g" \
+    | sed "s/passwordreplace/$sqlPasswordbase64/g" \
+    | sed "s/serverreplace/$sqlServerFQDNbase64/g" \
+    | tee "sql-secret-$teamName.yaml"
+kubectl apply -f $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/sql-secret-"$teamName".yaml"
