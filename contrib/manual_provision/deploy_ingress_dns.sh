@@ -13,7 +13,7 @@ declare resourceGroupLocation=""
 declare teamName=""
 
 # Initialize parameters specified from command line
-while getopts ":s:r:" arg; do
+while getopts ":s:l:n:" arg; do
     case "${arg}" in
         s)
             relativeSaveLocation=${OPTARG}
