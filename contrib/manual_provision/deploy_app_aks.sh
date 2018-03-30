@@ -10,6 +10,7 @@ usage() { echo "Usage: deploy_app_aks.sh -s <relative save location>  -r <regist
 
 declare relativeSaveLocation=""
 declare registryName=""
+declare imageTag=""
 
 # Initialize parameters specified from command line
 while getopts ":s:r:" arg; do
@@ -20,7 +21,9 @@ while getopts ":s:r:" arg; do
         r)
             registryName=${OPTARG}
         ;;
-
+        t)
+            imageTag=${OPTARG}
+        ;;
     esac
 done
 shift $((OPTIND-1))
@@ -50,17 +53,14 @@ while [ $tiller != "Running" ]; do
         tiller=$(kubectl get pods --all-namespaces | grep tiller | awk '{print $4}')
         sleep 5
 done
-
-# Add a loop to wait after the tiller installation
-# Ex : Kubectl get pods --all-namespaces -> tiller-*************** - Creating... Deployed
-
-# You can override the values from the values.yaml using the --set cmd
-# https://github.com/Azure-Samples/openhack-devops/blob/add_helm/src/MobileAppServiceV2/MyDriving.POIService.v2/helm/values.yaml
-
-# Make sure you have the hosts CNAME entry in your DNS provider
- :
 echo "helm install ... from: " 
 echo $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm"
 echo "Registry: " $registryName 
-helm install $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm" --name getallpois --set image.repository=$registryName
-#--set ingress.hosts=mydriving-admin.julien.work,image.repository=julienstroheker.azurecr.io/myapp,image.tag=v34,ingress.path="/api/GetAllPOIs"
+# You can override the values from the values.yaml using the --set cmd
+# https://github.com/Azure-Samples/openhack-devops/blob/add_helm/src/MobileAppServiceV2/MyDriving.POIService.v2/helm/values.yaml
+
+# TODO: sed replace the value for the ingress hostname before deploying the chart
+
+helm install $relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm" --name api-pois --set image.repository=$registryName/apipois
+
+# TODO: helm install the User and Trip APIs
