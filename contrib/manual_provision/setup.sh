@@ -119,10 +119,17 @@ else
     echo "Using existing resource group..."
 fi
 
+echo "1-Provision ACR"
 bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupTeam -r $registryName -l $resourceGroupLocation
+echo "2-Provision AKS"
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation
+echo "3-Set AKS/ACR permissions"
 bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
+echo "4-Clone and build container"
 bash ./fetch_build_push_latest.sh -b Release -r $resourceGroupTeam -t $teamName":latest" -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
+echo "5-Deploy ingress"
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n $teamName
+echo "6-Configure SQL"
 bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n $teamName -u YourUserName
+echo "7-Deploy AKS"
 bash ./deploy_app_aks.sh -s ./test_fetch_build -r $registryName -t $teamName
