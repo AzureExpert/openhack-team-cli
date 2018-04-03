@@ -2,33 +2,22 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-usage() { echo "Usage: setup.sh -i <subscriptionId> -g <resourceGroupTeam> -s <resourceGroupShared> -r <registryName> -c <clusterName> -l <resourceGroupLocation> -n <teamName>" 1>&2; exit 1; }
+usage() { echo "Usage: setup.sh -i <subscriptionId> -s <resourceGroupShared> -l <resourceGroupLocation> -n <teamName>" 1>&2; exit 1; }
 
 declare subscriptionId=""
-declare resourceGroupTeam=""
 declare resourceGroupShared=""
-declare registryName=""
-declare clusterName=""
 declare resourceGroupLocation=""
 declare teamName=""
 
+
 # Initialize parameters specified from command line
-while getopts ":i:g:s:r:c:l:n:" arg; do
+while getopts ":i:t:s:r:c:l:n:" arg; do
     case "${arg}" in
         i)
             subscriptionId=${OPTARG}
         ;;
-        g)
-            resourceGroupTeam=${OPTARG}
-        ;;
         s)
             resourceGroupShared=${OPTARG}
-        ;;
-        r)
-            registryName=${OPTARG}
-        ;;
-        c)
-            clusterName=${OPTARG}
         ;;
         l)
             resourceGroupLocation=${OPTARG}
@@ -48,29 +37,11 @@ if [[ -z "$subscriptionId" ]]; then
     [[ "${subscriptionId:?}" ]]
 fi
 
-if [[ -z "$resourceGroupTeam" ]]; then
-    echo "This script will look for an existing resource group, otherwise a new one will be created "
-    echo "You can create new resource groups with the CLI using: az group create "
-    echo "Enter a resource group name"
-    read resourceGroupTeam
-    [[ "${resourceGroupTeam:?}" ]]
-fi
-
 if [[ -z "$resourceGroupShared" ]]; then
     echo "This is the name of the resourcegrouo for the shared infrastructure"
     echo "Enter a resource group name"
     read resourceGroupShared
     [[ "${resourceGroupShared:?}" ]]
-fi
-
-if [[ -z "$registryName" ]]; then
-    echo "Enter a name for the Azure Container Registry you want to create:"
-    read registryName
-fi
-
-if [[ -z "$clusterName" ]]; then
-    echo "Enter a name for the Azure Kubernetes Service (AKS) you want to create:"
-    read clusterName
 fi
 
 if [[ -z "$resourceGroupLocation" ]]; then
@@ -86,10 +57,21 @@ if [[ -z "$teamName" ]]; then
     read teamName
 fi
 
-if [ -z "$subscriptionId" ] || [ -z "$resourceGroupTeam" ] || [ -z "$registryName" ] || [ -z "$clusterName" ] || [ -z "$resourceGroupLocation" ] || [ -z "$teamName" ]; then
+if [ -z "$subscriptionId" ] || [ -z "$resourceGroupShared" ] || [ -z "$resourceGroupLocation" ] || [ -z "$teamName" ]; then
     echo "Parameter missing..."
     usage
 fi
+
+randomChar() {
+    s=abcdefghijklmnopqrstuvxwyz0123456789
+    p=$(( $RANDOM % 36))
+    echo -n ${s:$p:1}
+}
+
+declare random4Chars="$(randomChar;randomChar;randomChar;randomChar;)"
+declare resourceGroupTeam="${teamName}rg${random4Chars}";
+declare registryName="${teamName}acr${random4Chars}"
+declare clusterName="${teamName}aks${random4Chars}"
 
 #login to azure using your credentials
 az account show 1> /dev/null
@@ -100,10 +82,13 @@ then
 fi
 
 #set the default subscription id
-az account set --subscription $subscriptionId
+echo "Setting subscription to $SubscriptionId..."
+
+az account set --subscription $subscriptionId  1> /dev/null
 
 #TODO need to check if provider is registered and if so don't run this command.  Also probably need to sleep a few minutes for this to finish.
-az provider register -n Microsoft.ContainerService
+echo "Registering ContainerServiceProvider..."
+az provider register -n Microsoft.ContainerService 1> /dev/null
 
 set +e
 
@@ -113,21 +98,29 @@ if [ `az group exists -n $resourceGroupTeam` == false ]; then
     set -e
     (
         set -x
-        az group create --name $resourceGroupTeam --location $resourceGroupLocation 1> /dev/null
+        az group create --name $resourceGroupTeam --location $resourceGroupLocation
     )
 else
     echo "Using existing resource group..."
 fi
 
+echo "1-Provision ACR"
 bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupTeam -r $registryName -l $resourceGroupLocation
+echo "2-Provision AKS"
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation
+echo "3-Set AKS/ACR permissions"
 bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
+echo "4-Clone repo"
 bash ./git_fetch.sh -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
+echo "5-Deploy ingress"
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n $teamName
+echo "6-Configure SQL"
 bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n $teamName -u YourUserName
-
 # Save the public DNS address to be provisioned in the helm charts for each service
 dnsURL='akstraefik'$teamName'.'$resourceGroupLocation'.cloudapp.azure.com'
+echo "7-Build and deploy POI API to AKS"
 bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n $teamName
+echo "8-Build and deploy User API to AKS"
 bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n $teamName
+echo "9-Build and deploy Trip API to AKS"
 bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n $teamName
