@@ -130,3 +130,4 @@ bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n $teamNa
 dnsURL='akstraefik'$teamName'.'$resourceGroupLocation'.cloudapp.azure.com'
 bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n $teamName
 bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n $teamName
+bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n $teamName
