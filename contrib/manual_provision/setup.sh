@@ -122,7 +122,11 @@ fi
 bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupTeam -r $registryName -l $resourceGroupLocation
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation
 bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
-bash ./fetch_build_push_latest.sh -b Release -r $resourceGroupTeam -t $teamName":latest" -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
+bash ./git_fetch.sh -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n $teamName
 bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n $teamName -u YourUserName
-bash ./deploy_app_aks.sh -s ./test_fetch_build -r $registryName -t $teamName
+
+# Save the public DNS address to be provisioned in the helm charts for each service
+dnsURL='akstraefik'$teamName'.'$resourceGroupLocation'.cloudapp.azure.com'
+bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n $teamName
+bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n $teamName
