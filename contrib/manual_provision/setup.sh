@@ -110,12 +110,17 @@ echo "2-Provision AKS"
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation
 echo "3-Set AKS/ACR permissions"
 bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
-echo "4-Clone and build container"
-bash ./fetch_build_push_latest.sh -b Release -r $resourceGroupTeam -t ${teamName}${random4Chars}":latest" -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
+echo "4-Clone repo"
+bash ./git_fetch.sh -u git@github.com:Azure-Samples/openhack-devops.git -s ./test_fetch_build
 echo "5-Deploy ingress"
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n ${teamName}${random4Chars}
 echo "6-Configure SQL"
 bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n ${teamName}${random4Chars} -u YourUserName
-echo "7-Deploy app to AKS"
-bash ./deploy_app_aks.sh -s ./test_fetch_build -r $registryName -t ${teamName}${random4Chars}
-
+# Save the public DNS address to be provisioned in the helm charts for each service
+dnsURL='akstraefik'${teamName}${random4Chars}'.'$resourceGroupLocation'.cloudapp.azure.com'
+echo "7-Build and deploy POI API to AKS"
+bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n ${teamName}${random4Chars}
+echo "8-Build and deploy User API to AKS"
+bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n ${teamName}${random4Chars}
+echo "9-Build and deploy Trip API to AKS"
+bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars}

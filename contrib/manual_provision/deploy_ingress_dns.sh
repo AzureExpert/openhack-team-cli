@@ -47,6 +47,22 @@ if [[ -z "$teamName" ]]; then
     read teamName
 fi
 
+echo "Upgrading tiller (helm server) to match client version."
+
+helm init --upgrade
+
+tiller=$(kubectl get pods --all-namespaces | grep tiller | awk '{print $4}')
+
+echo "Waiting for tiller ..."
+
+while [ $tiller != "Running" ]; do
+        echo "Waiting for tiller ..."
+        tiller=$(kubectl get pods --all-namespaces | grep tiller | awk '{print $4}')
+        sleep 5
+done
+
+echo "tiller upgrade complete."
+
 echo -e "\nUpdate the Traefik Ingress DNS name configuration ..."
 cat $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/traefik-values.yaml" \
     | sed "s/akstraefikreplaceme/akstraefik$teamName/g" \
