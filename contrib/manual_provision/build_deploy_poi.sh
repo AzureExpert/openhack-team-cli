@@ -107,19 +107,21 @@ echo "ACR ID: "$ACR_ID
 TAG=$ACR_ID"/devopsoh/"$imageTag
 
 echo "TAG: "$TAG
+pushd $relativeSaveLocation
 
-pushd ./openhack-devops/src/MobileAppServiceV2/POIService
+pushd ./openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.V2
 
 dotnet build -c $buildFlavor -o ./bin/
 
 sed -i -e 's/bin\//..\/bin\//g' ./bin/GetAllPOIs/function.json
 
-docker build . -t $TAG 
+docker build . -t $TAG
 
 docker push $TAG
 
 echo -e "\nSuccessfully pushed image: "$TAG
 
+popd
 popd
 
 installPath=$relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/POIService/helm"
@@ -129,8 +131,11 @@ sed -i -e "s/dnsurlreplace/$dnsUrl/g" $installPath"/values.yaml"
 
 cat $installPath"/values.yaml" \
     | sed "s/dnsurlreplace/$dnsUrl/g" \
-    | tee "values-poi-$teamName.yaml"
+    | sed "s/imagetag/$TAG/g" \
+    | tee $relativeSaveLocation"\values-poi-$teamName.yaml"
 
-helmTeamValues="values-poi-$teamName.yaml"
+#helmTeamValues="values-poi-$teamName.yaml"
 
-helm install $installPath --name api-pois -f $helmTeamValues --set image.repository=$TAG
+helm install $installPath --name api-pois -f $relativeSaveLocation"\values-poi-$teamName.yaml" --set image.repository=$TAG
+
+
