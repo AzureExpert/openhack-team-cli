@@ -75,9 +75,9 @@ sqlPasswordbase64=$(echo $sqlPassword | base64)
 sqlUserbase64=$(echo $sqlUser | base64)
 
 # Replace the secrets file with encoded values and create the secret on the cluster
-cat $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/sql-secret.yaml" \
+cat "./sql-secret.yaml" \
     | sed "s/userreplace/$sqlUserbase64/g" \
     | sed "s/passwordreplace/$sqlPasswordbase64/g" \
     | sed "s/serverreplace/$sqlServerFQDNbase64/g" \
-    | tee "sql-secret-$teamName.yaml"
-kubectl apply -f $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/sql-secret-"$teamName".yaml"
+    | tee $relativeSaveLocation"/sql-secret-$teamName.yaml"
+kubectl apply -f $relativeSaveLocation"/sql-secret-$teamName.yaml"

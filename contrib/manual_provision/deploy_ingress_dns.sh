@@ -63,14 +63,17 @@ done
 
 echo "tiller upgrade complete."
 
+echo "Updating repo information"
+helm repo update
+
 echo -e "\nUpdate the Traefik Ingress DNS name configuration ..."
-cat $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/traefik-values.yaml" \
+cat "./traefik-values.yaml" \
     | sed "s/akstraefikreplaceme/akstraefik$teamName/g" \
     | sed "s/locationreplace/$resourceGroupLocation/g" \
-    | tee "traefik$teamName.yaml"
+    | tee $relativeSaveLocation"/traefik$teamName.yaml"
 
 echo -e "\n\nInstalling Traefik Ingress controller ..."
-helm install --name team-ingress stable/traefik --version 1.27.0 -f $relativeSaveLocation"openhack-team-cli/contrib/manual_provision/traefik$teamName.yaml"
+helm install stable/traefik --name team-ingress --version 1.27.0 -f $relativeSaveLocation"/traefik$teamName.yaml"
 
 echo "Waiting for public IP:"
 time=0
