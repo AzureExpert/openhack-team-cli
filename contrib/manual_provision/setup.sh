@@ -73,6 +73,19 @@ declare resourceGroupTeam="${teamName}rg${random4Chars}";
 declare registryName="${teamName}acr${random4Chars}"
 declare clusterName="${teamName}aks${random4Chars}"
 
+echo "=========================================="
+echo " VARIABLES"
+echo "=========================================="
+echo "subscriptionId            = "${subscriptionId}
+echo "resourceGroupShared       = "${resourceGroupShared}
+echo "resourceGroupLocation     = "${resourceGroupLocation}
+echo "teamName                  = "${teamName}
+echo "random4Chars              = "${random4Chars}
+echo "resourceGroupTeam         = "${resourceGroupTeam}
+echo "registryName              = "${registryName}
+echo "clusterName               = "${clusterName}
+echo "=========================================="
+
 #login to azure using your credentials
 az account show 1> /dev/null
 
@@ -82,13 +95,13 @@ then
 fi
 
 #set the default subscription id
-echo "Setting subscription to $SubscriptionId..."
+echo "Setting subscription to $subscriptionId..."
 
-az account set --subscription $subscriptionId  1> /dev/null
+az account set --subscription $subscriptionId
 
 #TODO need to check if provider is registered and if so don't run this command.  Also probably need to sleep a few minutes for this to finish.
 echo "Registering ContainerServiceProvider..."
-az provider register -n Microsoft.ContainerService 1> /dev/null
+az provider register -n Microsoft.ContainerService
 
 set +e
 
