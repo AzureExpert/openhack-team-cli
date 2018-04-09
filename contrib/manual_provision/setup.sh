@@ -137,3 +137,6 @@ echo "8-Build and deploy User API to AKS"
 bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n ${teamName}${random4Chars}
 echo "9-Build and deploy Trip API to AKS"
 bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars}
+
+echo "Deleting working directory"
+rm -rf ./test_fetch_build
