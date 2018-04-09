@@ -92,10 +92,9 @@ echo $resourceGroupName
 echo $imageTag
 echo $relativeSaveLocation
 echo $dnsUrl
-echo -e '\n'
 
 ACR=`az acr list -g $resourceGroupName --query "[].{acrName:name}" --output json | jq .[].acrName | sed 's/\"//g'`
-
+echo "$ACR"
 #login to ACR
 az acr login --name $ACR
 
@@ -127,15 +126,14 @@ popd
 installPath=$relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/POIService/helm"
 echo -e "\nhelm install ... from: " $installPath
 
-sed -i -e "s/dnsurlreplace/$dnsUrl/g" $installPath"/values.yaml"
-
 cat $installPath"/values.yaml" \
     | sed "s/dnsurlreplace/$dnsUrl/g" \
-    | sed "s/imagetag/$TAG/g" \
-    | tee $relativeSaveLocation"\values-poi-$teamName.yaml"
+    | sed "s/acrreplace/$ACR_ID/g" \
+    | sed "s/imagetagreplace/$imageTag/g" \
+    | tee $relativeSaveLocation"/values-poi-$teamName.yaml"
 
 #helmTeamValues="values-poi-$teamName.yaml"
 
-helm install $installPath --name api-pois -f $relativeSaveLocation"\values-poi-$teamName.yaml" --set image.repository=$TAG
+helm install $installPath --name api-pois -f $relativeSaveLocation"/values-poi-$teamName.yaml" --set image.repository=$TAG
 
 
