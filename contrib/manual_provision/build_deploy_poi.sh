@@ -134,6 +134,6 @@ cat $installPath"/values.yaml" \
 
 #helmTeamValues="values-poi-$teamName.yaml"
 
-helm install $installPath --name api-pois -f $relativeSaveLocation"/values-poi-$teamName.yaml" --set image.repository=$TAG
+helm install $installPath --name api-poi -f $relativeSaveLocation"/values-poi-$teamName.yaml" --set image.repository=$TAG
 
 
