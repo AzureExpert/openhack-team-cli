@@ -132,8 +132,10 @@ cat $installPath"/values.yaml" \
     | sed "s/imagetagreplace/$imageTag/g" \
     | tee $relativeSaveLocation"/values-poi-$teamName.yaml"
 
-#helmTeamValues="values-poi-$teamName.yaml"
+echo "replacing values file in chart"
+mv $relativeSaveLocation"/values-poi-$teamName.yaml" $installPath"/values.yaml"
 
-helm install $installPath --name api-poi -f $relativeSaveLocation"/values-poi-$teamName.yaml" --set image.repository=$TAG
+echo "deploying POI Service chart"
+helm install $installPath --name api-poi --set image.repository=$TAG
 
 
