@@ -6,15 +6,16 @@ IFS=$'\n\t'
 # -o: prevents errors in a pipeline from being masked
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
 
-usage() { echo "Usage: deploy_app_aks.sh -s <relative save location> -g <resourceGroupName> -u <sql server user name> -n <teamName>" 1>&2; exit 1; }
+usage() { echo "Usage: deploy_app_aks.sh -s <relative save location> -g <resourceGroupName> -u <sql server user name> -n <teamName> -k <keyVaultName>" 1>&2; exit 1; }
 
 declare relativeSaveLocation=""
 declare resourceGroupName=""
 declare sqlUser=""
 declare teamName=""
+declare keyVaultName=""
 
 # Initialize parameters specified from command line
-while getopts ":s:g:n:u:" arg; do
+while getopts ":s:g:n:u:k:" arg; do
     case "${arg}" in
         s)
             relativeSaveLocation=${OPTARG}
@@ -22,11 +23,14 @@ while getopts ":s:g:n:u:" arg; do
         g)
             resourceGroupName=${OPTARG}
         ;;
+        u)
+            sqlUser=${OPTARG}
+        ;;
         n)
             teamName=${OPTARG}
         ;;
-        u)
-            sqlUser=${OPTARG}
+        k)
+            keyVaultName=${OPTARG}
         ;;
     esac
 done
@@ -55,6 +59,11 @@ if [[ -z "$teamName" ]]; then
     read teamName
 fi
 
+if [[ -z "$keyVaultName" ]]; then
+    echo "Enter the name of the keyvault that was provisioned in shared infrastructure:"
+    read keyVaultName
+fi
+
 INGRESS_IP=$(kubectl get svc team-ingress-traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 # Get the name of the SQL server
@@ -67,7 +76,7 @@ echo -e "\n\nSQL Server Firewall rule added to allow $INGRESS_IP."
 
 # Get the values to update the SQL Server secrets yaml file and create it on the cluster
 sqlServerFQDN=$(az sql server list -g $resourceGroupName -o tsv --query [0].fullyQualifiedDomainName)
-sqlPassword=$(az keyvault secret show --vault-name devops-openhack-keyvault --name sqlServerAdminPassword -o tsv --query value)
+sqlPassword=$(az keyvault secret show --vault-name $keyVaultName --name sqlServerAdminPassword -o tsv --query value)
 
 # Base64 encode the values are required for K8s secrets
 sqlServerFQDNbase64=$(echo $sqlServerFQDN | base64)

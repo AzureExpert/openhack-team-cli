@@ -2,16 +2,16 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-usage() { echo "Usage: setup.sh -i <subscriptionId> -s <resourceGroupShared> -l <resourceGroupLocation> -n <teamName>" 1>&2; exit 1; }
+usage() { echo "Usage: setup.sh -i <subscriptionId> -s <resourceGroupShared> -l <resourceGroupLocation> -n <teamName> -k <keyVaultName>" 1>&2; exit 1; }
 
 declare subscriptionId=""
 declare resourceGroupShared=""
 declare resourceGroupLocation=""
 declare teamName=""
-
+declare keyVaultName=""
 
 # Initialize parameters specified from command line
-while getopts ":i:t:s:r:c:l:n:" arg; do
+while getopts ":i:t:s:r:c:l:n:k:" arg; do
     case "${arg}" in
         i)
             subscriptionId=${OPTARG}
@@ -24,6 +24,9 @@ while getopts ":i:t:s:r:c:l:n:" arg; do
         ;;
         n)
             teamName=${OPTARG}
+        ;;
+        k)
+            keyVaultName=${OPTARG}
         ;;
     esac
 done
@@ -57,7 +60,12 @@ if [[ -z "$teamName" ]]; then
     read teamName
 fi
 
-if [ -z "$subscriptionId" ] || [ -z "$resourceGroupShared" ] || [ -z "$resourceGroupLocation" ] || [ -z "$teamName" ]; then
+if [[ -z "$keyVaultName" ]]; then
+    echo "Enter the name of the keyvault that was provisioned in shared infrastructure:"
+    read keyVaultName
+fi
+
+if [ -z "$subscriptionId" ] || [ -z "$resourceGroupShared" ] || [ -z "$resourceGroupLocation" ] || [ -z "$teamName" ] || [ -z "$keyVaultName" ]; then
     echo "Parameter missing..."
     usage
 fi
@@ -80,6 +88,7 @@ echo "subscriptionId            = "${subscriptionId}
 echo "resourceGroupShared       = "${resourceGroupShared}
 echo "resourceGroupLocation     = "${resourceGroupLocation}
 echo "teamName                  = "${teamName}
+echo "keyVaultName              = "${keyVaultName}
 echo "random4Chars              = "${random4Chars}
 echo "resourceGroupTeam         = "${resourceGroupTeam}
 echo "registryName              = "${registryName}
@@ -128,15 +137,15 @@ bash ./git_fetch.sh -u git@github.com:Azure-Samples/openhack-devops.git -s ./tes
 echo "5-Deploy ingress"
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n ${teamName}${random4Chars}
 echo "6-Configure SQL"
-bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -n ${teamName}${random4Chars} -u YourUserName
+bash ./configure_sql.sh -s ./test_fetch_build -g $resourceGroupShared -u YourUserName -n ${teamName}${random4Chars} -k ${keyVaultName}
 # Save the public DNS address to be provisioned in the helm charts for each service
 dnsURL='akstraefik'${teamName}${random4Chars}'.'$resourceGroupLocation'.cloudapp.azure.com'
-echo "7-Build and deploy POI API to AKS"
-bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n ${teamName}${random4Chars}
+# echo "7-Build and deploy POI API to AKS"
+# bash ./build_deploy_poi.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-poi' -d $dnsURL -n ${teamName}${random4Chars}
 echo "8-Build and deploy User API to AKS"
 bash ./build_deploy_user.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-user' -d $dnsURL -n ${teamName}${random4Chars}
-echo "9-Build and deploy Trip API to AKS"
-bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars}
+# echo "9-Build and deploy Trip API to AKS"
+# bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars}
 
 echo "Deleting working directory"
 rm -rf ./test_fetch_build
