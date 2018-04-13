@@ -96,7 +96,7 @@ echo "Getting Credentials for AKS cluster..."
 
 if [ $? == 0 ];
 then
-    echo "Credentials for AKS:" $clusterName " retrieved successfully..."
+    echo "Credentials for AKS: "$clusterName" retrieved successfully..."
 fi
 
 
