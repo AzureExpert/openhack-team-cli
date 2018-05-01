@@ -21,8 +21,9 @@
 ### Parameters
 
 - SubscriptionId - id of the subscription to deploy the team infrastructure to
-- resourceGroupName -  The name of the resource group to create and deploy to.
-- regisgtryName - Name for the Azure Container Registry **_(MUST BE UNIQUE)_**
-- clusterName - Name of the Azure Kubernetes Service (k8s) instance **_(MUST BE UNIQUE)_**
-- resourceGroupLocation - Azure region to deploy to.  **_Must be a region that supports ACR and AKS._**
-- teamName - name of the team.  Containers and apps will use this value in provisioning.
+- resourceGroupLocation - Azure region to deploy to.  **_Must be a region that supports ACR, AKS, and KeyVault._**
+- teamName - name of the team.  Containers and apps will use this value in provisioning.  **_Must be all lowercase alphanumeric characters_**
+
+An example command to provision might look like the following:
+
+`./setup.sh -i e57679d8-3a04-4828-97e6-35169ea30349 -l eastus -n devopsoh`

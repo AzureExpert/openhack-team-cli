@@ -61,6 +61,9 @@ while [ $tiller != "Running" ]; do
         sleep 5
 done
 
+# Temporary fix until helm 2.9.1 patch https://github.com/kubernetes/helm/issues/3985
+kubectl -n kube-system patch deployment tiller-deploy -p '{"spec": {"template": {"spec": {"automountServiceAccountToken": true}}}}'
+
 echo "tiller upgrade complete."
 
 echo "Updating repo information"
@@ -96,6 +99,7 @@ echo "Writing the public IP of the team endpoint"
 # Verify that the teamConfig file exist
 if [ ! -d "$HOME/team_env" ]; then
    mkdir $HOME/team_env
+   touch $HOME/team_env/teamConfig.json
 fi
 
 existingEnv="$(<$HOME/team_env/teamConfig.json)"

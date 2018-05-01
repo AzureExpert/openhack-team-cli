@@ -98,7 +98,7 @@ echo "$ACR"
 #login to ACR
 az acr login --name $ACR
 
-#get the acr repsotiory id to tag image with.
+#get the acr repository id to tag image with.
 ACR_ID=`az acr list -g $resourceGroupName --query "[].{acrLoginServer:loginServer}" --output json | jq .[].acrLoginServer | sed 's/\"//g'`
 
 echo "ACR ID: "$ACR_ID
@@ -106,9 +106,8 @@ echo "ACR ID: "$ACR_ID
 TAG=$ACR_ID"/devopsoh/"$imageTag
 
 echo "TAG: "$TAG
-pushd $relativeSaveLocation
 
-pushd ./openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.V2
+pushd $relativeSaveLocation/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2
 
 dotnet build -c $buildFlavor -o ./bin/
 
@@ -121,21 +120,21 @@ docker push $TAG
 echo -e "\nSuccessfully pushed image: "$TAG
 
 popd
-popd
 
-installPath=$relativeSaveLocation"/openhack-devops/src/MobileAppServiceV2/POIService/helm"
-echo -e "\nhelm install ... from: " $installPath
+pushd $relativeSaveLocation/openhack-devops/src/MobileAppServiceV2/MyDriving.POIService.v2/helm
+echo -e "\nhelm install from: " $PWD "\n\n"
 
-cat $installPath"/values.yaml" \
+cat "./values.yaml" \
     | sed "s/dnsurlreplace/$dnsUrl/g" \
     | sed "s/acrreplace/$ACR_ID/g" \
     | sed "s/imagetagreplace/$imageTag/g" \
-    | tee $relativeSaveLocation"/values-poi-$teamName.yaml"
+    | tee "./values-poi-$teamName.yaml"
 
 echo "replacing values file in chart"
-mv $relativeSaveLocation"/values-poi-$teamName.yaml" $installPath"/values.yaml"
+mv "./values-poi-$teamName.yaml" "./values.yaml"
 
 echo "deploying POI Service chart"
-helm install $installPath --name api-poi --set image.repository=$TAG
+helm install . --name api-poi --set image.repository=$TAG
 
+popd
 

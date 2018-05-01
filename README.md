@@ -37,3 +37,12 @@ The code for the project is organized as follows:
 * Shared libraries are stored in pkg/.
 * The tests/ directory contains a number of utility scripts. Most of these are used by the CI/CD pipeline. [TODO]
 * The docs/ folder is used for documentation and examples. [TODO]
+
+#### Manual Provisioning
+
+1. Change to the `./contrib/manual_provision/` directory
+1. Replace the values and then execute the following script:
+
+```bash
+./setup.sh -i <subscriptionId> -l <resourceGroupLocation> -n <teamName>
+```

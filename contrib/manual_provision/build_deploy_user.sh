@@ -98,7 +98,7 @@ echo -e '\n'
 ACR=`az acr list -g $resourceGroupName --query "[].{acrName:name}" --output json | jq .[].acrName | sed 's/\"//g'`
 
 #login to ACR
-az acr login --name $ACR
+#az acr login --name $ACR
 
 #get the acr repsotiory id to tag image with.
 ACR_ID=`az acr list -g $resourceGroupName --query "[].{acrLoginServer:loginServer}" --output json | jq .[].acrLoginServer | sed 's/\"//g'`
