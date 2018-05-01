@@ -141,5 +141,5 @@ echo -e "DNS URL for "${teamName}" is:\n"$dnsURL
 # echo "9-Build and deploy Trip API to AKS  (# bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars})"
 # bash ./build_deploy_trip.sh -s ./test_fetch_build -b Release -r $resourceGroupTeam -t 'api-trip' -d $dnsURL -n ${teamName}${random4Chars}
 
-# echo "Deleting working directory"
-# rm -rf ./test_fetch_build
+echo "10- Clean the working environment"
+bash ./cleanup_environment.sh -t ${teamName}

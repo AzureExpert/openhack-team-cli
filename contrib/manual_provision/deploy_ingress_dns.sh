@@ -89,3 +89,20 @@ INGRESS_IP=$(kubectl get svc team-ingress-traefik -o jsonpath='{.status.loadBala
 
 DNS_HOSTNAME=akstraefik$teamName.$resourceGroupLocation.cloudapp.azure.com
 echo -e "\n\nExternal DNS hostname is https://"$DNS_HOSTNAME "which maps to IP " $INGRESS_IP
+
+# TODO: Export the DNS Hostname to a file on proctor VM
+echo "Writing the public IP of the team endpoint"
+
+# Verify that the teamConfig file exist
+if [ ! -d "$HOME/team_env" ]; then
+   mkdir $HOME/team_env
+fi
+
+existingEnv="$(<$HOME/team_env/teamConfig.json)"
+teamEndPoint="{
+    \"$teamName\": {
+        \"endpoint\": \"$INGRESS_IP\"
+    }
+}"
+
+echo $teamEndPoint $existingEnv | jq -s add > $HOME/team_env/teamConfig.json
