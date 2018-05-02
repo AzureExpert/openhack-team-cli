@@ -52,8 +52,6 @@ while getopts ":g:l:q:m:h:k:u:p:d:" arg; do
 done
 shift $((OPTIND-1))
 
-echo "blablablbalblabl $hostingPlanName"
-
 echo "$(tput setaf 3)Creating App Service plan...$(tput sgr 0)"
 (
 	set -x
@@ -63,7 +61,7 @@ echo "$(tput setaf 3)Creating App Service plan...$(tput sgr 0)"
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)App Service plan:" $hostingPlanName "created successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)App Service plan" $hostingPlanName "created successfully...$(tput sgr 0)"
 fi
 
 
@@ -75,7 +73,7 @@ echo "$(tput setaf 3)Creating web app...$(tput sgr 0)"
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)Web app:" $mobileAppName "created successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)Web app" $mobileAppName "created successfully...$(tput sgr 0)"
 fi
 
 echo "$(tput setaf 3)Creating SQL Server...$(tput sgr 0)"
@@ -87,7 +85,7 @@ echo "$(tput setaf 3)Creating SQL Server...$(tput sgr 0)"
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)SQL Server:" $sqlServerName "created successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)SQL Server" $sqlServerName "created successfully...$(tput sgr 0)"
 fi
 
 echo "$(tput setaf 3)Setting firewall rules of SQL Server...$(tput sgr 0)"
@@ -99,7 +97,7 @@ echo "$(tput setaf 3)Setting firewall rules of SQL Server...$(tput sgr 0)"
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)Firewall rules of SQL Server:" $sqlServerName "created successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)Firewall rules of SQL Server" $sqlServerName "created successfully...$(tput sgr 0)"
 fi
 
 
@@ -112,7 +110,7 @@ echo "$(tput setaf 3)Creating the database...$(tput sgr 0)"
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)Database:" $sqlDBName "created successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)Database" $sqlDBName "created successfully...$(tput sgr 0)"
 fi
 
 echo "$(tput setaf 3)Getting the connections string and assigning it to the app settings of the we app...$(tput sgr 0)"
@@ -128,7 +126,7 @@ echo "$(tput setaf 3)Getting the connections string and assigning it to the app 
 
 if [ $? == 0 ];
 then
-    echo "$(tput setaf 2)Connection string added to web app:" $mobileAppName " successfully...$(tput sgr 0)"
+    echo "$(tput setaf 2)Connection string added to web app" $mobileAppName " successfully...$(tput sgr 0)"
 fi
 
 echo "$(tput setaf 3)Adding values to Key Vault...$(tput sgr 0)"
@@ -138,6 +136,7 @@ echo "$(tput setaf 3)Adding values to Key Vault...$(tput sgr 0)"
     az keyvault secret set --vault-name $keyVaultName --name 'sqlServerName' --value $sqlServerName
     az keyvault secret set --vault-name $keyVaultName --name 'sqlDBName' --value $sqlDBName
     az keyvault secret set --vault-name $keyVaultName --name 'sqlServerUsername' --value $sqlServerUsername
+    az keyvault secret set --vault-name $keyVaultName --name 'sqlServerPassword' --value $sqlServerPassword
     az keyvault secret set --vault-name $keyVaultName --name 'sqlServerFQDN' --value $sqlServerFQDN
     az keyvault secret set --vault-name $keyVaultName --name 'mobileAppName' --value $mobileAppName
 )
