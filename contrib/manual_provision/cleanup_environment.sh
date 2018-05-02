@@ -15,6 +15,11 @@ if [[ -z "$teamName" ]]; then
     read teamName
 fi
 
+if [ -z "$teamName" ] ; then
+    echo "The team name is empty"
+    usage
+fi
+
 if [ ! -d "$HOME/team-env" ]; then
     mkdir $HOME/team-env
 fi 

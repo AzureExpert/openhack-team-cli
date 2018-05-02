@@ -93,15 +93,17 @@ echo $imageTag
 echo $relativeSaveLocation
 echo $dnsUrl
 
-ACR=`az acr list -g $resourceGroupName --query "[].{acrName:name}" --output json | jq .[].acrName | sed 's/\"//g'`
-echo "$ACR"
-#login to ACR
-az acr login --name $ACR
-
 #get the acr repository id to tag image with.
 ACR_ID=`az acr list -g $resourceGroupName --query "[].{acrLoginServer:loginServer}" --output json | jq .[].acrLoginServer | sed 's/\"//g'`
 
 echo "ACR ID: "$ACR_ID
+
+#Get the acr admin password and login to the registry
+registryName=$(az acr list -g $resourceGroupName | jq -r .[].name)
+acrPassword=$(az acr credential show -n $registryName | jq -r '[.passwords[0].value] | .[]')
+
+docker login $ACR_ID -u $registryName -p $acrPassword
+echo "Authenticated to ACR with username and password"
 
 TAG=$ACR_ID"/devopsoh/"$imageTag
 

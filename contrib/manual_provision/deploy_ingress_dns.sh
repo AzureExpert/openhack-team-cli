@@ -78,6 +78,16 @@ cat "./traefik-values.yaml" \
     | tee $relativeSaveLocation"/traefik$teamName.yaml"
 
 echo -e "\n\nInstalling Traefik Ingress controller ..."
+echo -e "Waiting for tiller to be ready" 
+time=0 
+while true; do
+        TILLER_STATUS=$(kubectl get pods --all-namespaces --selector=app=helm -o json | jq -r '.items[].status.phase')
+        if [[ "${TILLER_STATUS}" == "Running" ]]; then break; fi
+        sleep 10
+        time=$(($time+10))
+        echo $time "seconds waiting"
+done
+
 helm install stable/traefik --name team-ingress --version 1.27.0 -f $relativeSaveLocation"/traefik$teamName.yaml"
 
 echo "Waiting for public IP:"

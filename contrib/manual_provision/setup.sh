@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -24,6 +25,16 @@ while getopts ":i:t:s:r:c:l:n:k:" arg; do
     esac
 done
 shift $((OPTIND-1))
+
+# Check if kubectl is installed or that we can install it
+type -p kubectl 
+if [ ! $? == 0 ]; then 
+    # we need to install kubectl therefore root is needed
+    if [[ ! $EUID == 0 ]]; then 
+        echo "The script must run elevated to install kubectl"
+        exit 1
+    fi
+fi 
 
 #Prompt for parameters is some required parameters are missing
 if [[ -z "$subscriptionId" ]]; then
@@ -133,11 +144,12 @@ bash ./provision_acr.sh -i $subscriptionId -g $resourceGroupTeam -r $registryNam
 echo "2-Provision AKS  (bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation)"
 bash ./provision_aks.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -l $resourceGroupLocation
 
-echo "3-Set AKS/ACR permissions  (bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation)"
-bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
+#Remove do to the permission with the role assignment 
+#echo "3-Set AKS/ACR permissions  (bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation)"
+#bash ./provision_aks_acr_auth.sh -i $subscriptionId -g $resourceGroupTeam -c $clusterName -r $registryName -l $resourceGroupLocation
 
 echo "4-Clone repo"
-bash ./git_fetch.sh -u https://github.com/Azure-Samples/openhack-team-cli -s ./test_fetch_build
+bash ./git_fetch.sh -u https://github.com/Azure-Samples/openhack-devops -s ./test_fetch_build
 
 echo "5-Deploy ingress  (bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n ${teamName}${random4Chars})"
 bash ./deploy_ingress_dns.sh -s ./test_fetch_build -l $resourceGroupLocation -n ${teamName}${random4Chars}
