@@ -8,17 +8,18 @@ IFS=$'\n\t'
 #script requires latest version of .netcore to be installed ()
 
 
-usage() { echo "Usage: build_deploy_poi.sh -b <build flavor> -r <resourceGroupName>  -t <image tag> -s <relative save location> -d <dns host Url> -n <team name>" 1>&2; exit 1; }
+usage() { echo "Usage: build_deploy_poi.sh -b <build flavor> -r <resourceGroupName>  -t <image tag> -s <relative save location> -d <dns host Url> -n <team name> -g <registry name>" 1>&2; exit 1; }
 
 declare buildFlavor=""
 declare resourceGroupName=""
 declare imageTag=""
 declare relativeSaveLocation=""
 declare dnsUrl=""
-declare teamName""
+declare teamName=""
+declare registryName=""
 
 # Initialize parameters specified from command line
-while getopts ":b:r:t:s:d:n:" arg; do
+while getopts ":b:r:t:s:d:n:g:" arg; do
     case "${arg}" in
         b)
             buildFlavor=${OPTARG}
@@ -37,6 +38,9 @@ while getopts ":b:r:t:s:d:n:" arg; do
         ;;
         n)
             teamName=${OPTARG}
+        ;;
+        g)  
+            registryName=${OPTARG}
         ;;
     esac
 done
@@ -101,8 +105,7 @@ ACR_ID=`az acr list -g $resourceGroupName --query "[].{acrLoginServer:loginServe
 echo "ACR ID: "$ACR_ID
 
 #Get the acr admin password and login to the registry
-registryName=$(az acr list -g $resourceGroupName | jq -r .[].name)
-acrPassword=$(az acr credential show -n $registryName | jq -r '[.passwords[0].value] | .[]')
+acrPassword=$(az acr credential show -n $registryName -o json | jq -r '[.passwords[0].value] | .[]')
 
 docker login $ACR_ID -u $registryName -p $acrPassword
 echo "Authenticated to ACR with username and password"
